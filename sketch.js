@@ -30,22 +30,7 @@ function setup() {
 	boxArr = [];
 
 	initalizeDotArr();
-	initalizeLineArr();
-	
-	
-  // TESTING 
-	//dotArr[0][0].setColor(color(255,255,0));
-	//dotArr[1][0].setColor(color(255,255,0));
-	//dotArr[0][1].setColor(color(255,255,0));
-	//dotArr[1][1].setColor(color(255,255,0));
-	
-	//dotArr[0][0].isActive = true;
-	//dotArr[1][0].isActive = true;
-	//dotArr[0][1].isActive = true;
-	//dotArr[1][1].isActive = true;
-	
-	// END TESTING 
-	
+	initalizeLineArr();	
 	initalizeBoxArr();
 	
 	console.log(lineArr);
@@ -153,7 +138,6 @@ function draw() {
 	displayLines();
 	displayDots();
 
-
 	if (choiceA.isActive && !choiceB.isActive) {
 		// draw a line from current choice to mouse cursor
 		push();
@@ -163,19 +147,31 @@ function draw() {
 		pop();
 	}
 	if (choiceA.isActive && choiceB.isActive) {
-		//console.log("CHOICE MADE!");
+		console.log("CHOICE MADE!");
+		console.log(choiceA.x,choiceA.y,",",choiceB.x,choiceB.y);
+		var lineX;
+		var lineY;
+		if(choiceA.x == choiceB.x) {
+			lineX = choiceA.x + boxSize;
+		} else {
+			lineX = abs(choiceA.x - choiceB.x) + boxSize/2;
+		}
+		if(choiceA.y == choiceB.y) {
+			lineY = choiceA.y + boxSize;
+		} else {
+			lineY = abs(choiceA.y - choiceB.y) + boxSize/2;
 
+			
+		}
+		console.log("Line Midpoint:");
+		console.log(lineX,",",lineY);
 
 		// if no box has been made, change turns
 		turn = !turn;
 		
-		
 		choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 		choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 	}
-
-
-	
 
 	// show mouse over effect
 	for (var i = 0; i < dotArr.length; i++) {
