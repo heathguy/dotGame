@@ -232,47 +232,49 @@ function mousePressed() {
 						choiceA.isActive = true;
 
 					} else { // set choiceB
-						choiceB = dotArr[i][j];
-						// if dot is not currently part of a box?
-						var lineX;
-						var lineY;
-						if (choiceA.x == choiceB.x) {
-							lineX = choiceA.x;
-						} else {
-							if (choiceA.x > choiceB.x) {
-								lineX = choiceA.x - boxSize / 2;
+						if (dist(choiceA.x, choiceA.y, dotArr[i][j].x, dotArr[i][j].y) <= boxSize) {
+							choiceB = dotArr[i][j];
+							// if dot is not currently part of a box?
+							var lineX;
+							var lineY;
+							if (choiceA.x == choiceB.x) {
+								lineX = choiceA.x;
 							} else {
-								lineX = choiceB.x - boxSize / 2;
-							}
-						}
-						if (choiceA.y == choiceB.y) {
-							lineY = choiceA.y;
-						} else {
-							if (choiceA.y > choiceB.y) {
-								lineY = choiceA.y - boxSize / 2;
-							} else {
-								lineY = choiceB.y - boxSize / 2;
-							}
-						}
-						var lineExists = false;
-						for (var r = 0; r < (boardSize * 2); r++) {
-							for (var c = 0; c < boardSize; c++) {
-								if (lineArr[r][c].centerX == lineX && lineArr[r][c].centerY == lineY) {
-									lineExists = true;
+								if (choiceA.x > choiceB.x) {
+									lineX = choiceA.x - boxSize / 2;
+								} else {
+									lineX = choiceB.x - boxSize / 2;
 								}
 							}
-						}
-						if(!lineExists) {
-							dotArr[i][j].dotColor = getTurnColor();
-							//choiceB = dotArr[i][j];
-							choiceB.isActive = true;
-						} else {
-							choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
+							if (choiceA.y == choiceB.y) {
+								lineY = choiceA.y;
+							} else {
+								if (choiceA.y > choiceB.y) {
+									lineY = choiceA.y - boxSize / 2;
+								} else {
+									lineY = choiceB.y - boxSize / 2;
+								}
+							}
+							var lineExists = false;
+							for (var r = 0; r < (boardSize * 2); r++) {
+								for (var c = 0; c < boardSize; c++) {
+									if (lineArr[r][c].centerX == lineX && lineArr[r][c].centerY == lineY && lineArr[r][c].isActive) {
+										//console.log("LINE EXISTS!");
+										lineExists = true;
+									}
+								}
+							}
+							if (!lineExists) {
+								dotArr[i][j].dotColor = getTurnColor();
+								//choiceB = dotArr[i][j];
+								choiceB.isActive = true;
+							} else {
+								choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-
 }
