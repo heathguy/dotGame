@@ -30,9 +30,9 @@ function setup() {
 	boxArr = [];
 
 	initalizeDotArr();
-	initalizeLineArr();	
+	initalizeLineArr();
 	initalizeBoxArr();
-	
+
 	console.log(lineArr);
 
 	choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
@@ -54,37 +54,39 @@ function initalizeDotArr() {
 
 function initalizeLineArr() {
 	var inRow = true;
-	for (var i = 0; i < (boardSize*2); i++) {
-		if(i % 2 == 0) { inRow = true; }
-		else { inRow = false; }
+	for (var i = 0; i < (boardSize * 2); i++) {
+		if (i % 2 == 0) {
+			inRow = true;
+		} else {
+			inRow = false;
+		}
 		lineArr[i] = [];
 		for (var j = 0; j < boardSize; j++) {
-			
-			if(inRow) {
-				//var centerX = i * (boxSize/2) + boxSize;
-				var centerX = i * boxSize/2 + boxSize + (boxSize/2);
-				var centerY = j * boxSize + boxSize;
-				lineArr[i][j] = new lineObj(centerX, centerY, color(0, 0, 0, 0), 0, boxSize,dotSize);
 
-			}
-			else {
-				var centerX = i * boxSize/2 + boxSize/2;
-				var centerY = j * boxSize + boxSize + (boxSize/2);
-				lineArr[i][j] = new lineObj(centerX, centerY, color(0, 0, 0, 0), 0,dotSize,boxSize);
+			if (inRow) {
+				//var centerX = i * (boxSize/2) + boxSize;
+				var centerX = i * boxSize / 2 + boxSize + (boxSize / 2);
+				var centerY = j * boxSize + boxSize;
+				lineArr[i][j] = new lineObj(centerX, centerY, color(0, 0, 0, 0), 0, boxSize, dotSize);
+
+			} else {
+				var centerX = i * boxSize / 2 + boxSize / 2;
+				var centerY = j * boxSize + boxSize + (boxSize / 2);
+				lineArr[i][j] = new lineObj(centerX, centerY, color(0, 0, 0, 0), 0, dotSize, boxSize);
 			}
 		}
 	}
 }
 
 function initalizeBoxArr() {
-	for (var i = 0; i < boardSize-1; i++) {
+	for (var i = 0; i < boardSize - 1; i++) {
 		boxArr[i] = [];
-		for (var j = 0; j < boardSize-1; j++) {
-			var centerX = i * boxSize + boxSize + (boxSize/2);
-			var centerY = j * boxSize + boxSize + (boxSize/2);
-			
-			var nexti = i+1;
-			var nextj = j+1;
+		for (var j = 0; j < boardSize - 1; j++) {
+			var centerX = i * boxSize + boxSize + (boxSize / 2);
+			var centerY = j * boxSize + boxSize + (boxSize / 2);
+
+			var nexti = i + 1;
+			var nextj = j + 1;
 			//boxArr[i][j] = new boxObj(centerX,centerY,color(100,100,100),lineArr[i][j],lineArr[nexti][nextj],lineArr[i][nextj],lineArr[nexti][j]);
 			//boxArr[i][j].setColor(color(100,100,100));
 		}
@@ -106,11 +108,11 @@ function displayDots() {
 function displayLines() {
 	push();
 	rectMode(CENTER);
-	for (var i = 0; i < (boardSize*2); i++) {
+	for (var i = 0; i < (boardSize * 2); i++) {
 		for (var j = 0; j < boardSize; j++) {
 			stroke(51);
 			fill(lineArr[i][j].lineColor);
-			rect(lineArr[i][j].centerX,lineArr[i][j].centerY,lineArr[i][j].width,lineArr[i][j].height);
+			rect(lineArr[i][j].centerX, lineArr[i][j].centerY, lineArr[i][j].width, lineArr[i][j].height);
 		}
 	}
 	pop();
@@ -122,10 +124,10 @@ function displayBoxes() {
 	for (var i = 0; i < boxArr.length; i++) {
 		for (var j = 0; j < boxArr.length; j++) {
 			// if all 4 dots are active, draw the box
-			if(boxArr[i][j].topLine.isActive && boxArr[i][j].rightLine.isActive && boxArr[i][j].leftLine.isActive && boxArr[i][j].bottomLine.isActive) {
+			if (boxArr[i][j].topLine.isActive && boxArr[i][j].rightLine.isActive && boxArr[i][j].leftLine.isActive && boxArr[i][j].bottomLine.isActive) {
 				stroke(255);
 				fill(boxArr[i][j].boxColor);
-				rect(boxArr[i][j].centerX,boxArr[i][j].centerY,boxSize,boxSize);
+				rect(boxArr[i][j].centerX, boxArr[i][j].centerY, boxSize, boxSize);
 			}
 		}
 	}
@@ -148,27 +150,46 @@ function draw() {
 	}
 	if (choiceA.isActive && choiceB.isActive) {
 		console.log("CHOICE MADE!");
-		console.log(choiceA.x,choiceA.y,",",choiceB.x,choiceB.y);
+		console.log(choiceA.x, choiceA.y, ",", choiceB.x, choiceB.y);
 		var lineX;
 		var lineY;
-		if(choiceA.x == choiceB.x) {
-			lineX = choiceA.x + boxSize;
+		if (choiceA.x == choiceB.x) {
+			lineX = choiceA.x;
 		} else {
-			lineX = abs(choiceA.x - choiceB.x) + boxSize/2;
+			if (choiceA.x > choiceB.x) {
+				lineX = choiceA.x - boxSize / 2;
+			} else {
+				lineX = choiceB.x - boxSize / 2;
+			}
+			//lineX = abs(choiceA.x - choiceB.x) + boxSize/2;
 		}
-		if(choiceA.y == choiceB.y) {
-			lineY = choiceA.y + boxSize;
+		if (choiceA.y == choiceB.y) {
+			lineY = choiceA.y;
 		} else {
-			lineY = abs(choiceA.y - choiceB.y) + boxSize/2;
+			if (choiceA.y > choiceB.y) {
+				lineY = choiceA.y - boxSize / 2;
+			} else {
+				lineY = choiceB.y - boxSize / 2;
+			}
+			//lineY = abs(choiceA.y - choiceB.y) + boxSize/2;
+		}
+		// activate the line between the two points
 
-			
+		for (var i = 0; i < (boardSize * 2); i++) {
+			for (var j = 0; j < boardSize; j++) {
+				if (lineArr[i][j].centerX == lineX && lineArr[i][j].centerY == lineY) {
+					//console.log("LINE FOUND!");
+					lineArr[i][j].isActive = true;
+					lineArr[i][j].setColor(getTurnColor());
+				}
+			}
 		}
-		console.log("Line Midpoint:");
-		console.log(lineX,",",lineY);
+		//console.log("Line Midpoint:");
+		//console.log(lineX,",",lineY);
 
 		// if no box has been made, change turns
 		turn = !turn;
-		
+
 		choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 		choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 	}
@@ -200,26 +221,58 @@ function mousePressed() {
 		for (var j = 0; j < dotArr.length; j++) {
 			if (dist(mouseX, mouseY, dotArr[i][j].x, dotArr[i][j].y) <= dotSize / 2) {
 				//if dot clicked was choiceA, unselect choiceA
-					if (dotArr[i][j].x == choiceA.x && dotArr[i][j].y == choiceA.y) {
-						dotArr[i][j].dotColor = color(0, 0, 0, 0);
-						choiceA.isActive = false;
-					} else {
-						if (!choiceA.isActive) {
-								// if dot is not currently part of a box?
-								dotArr[i][j].dotColor = getTurnColor();
-								choiceA = dotArr[i][j];
-								choiceA.isActive = true;
+				if (dotArr[i][j].x == choiceA.x && dotArr[i][j].y == choiceA.y) {
+					dotArr[i][j].dotColor = color(0, 0, 0, 0);
+					choiceA.isActive = false;
+				} else {
+					if (!choiceA.isActive) {
+						// if dot is not currently part of a box?
+						dotArr[i][j].dotColor = getTurnColor();
+						choiceA = dotArr[i][j];
+						choiceA.isActive = true;
 
-						} else { // set choiceB
-							// if dot is not currently part of a box?
+					} else { // set choiceB
+						choiceB = dotArr[i][j];
+						// if dot is not currently part of a box?
+						var lineX;
+						var lineY;
+						if (choiceA.x == choiceB.x) {
+							lineX = choiceA.x;
+						} else {
+							if (choiceA.x > choiceB.x) {
+								lineX = choiceA.x - boxSize / 2;
+							} else {
+								lineX = choiceB.x - boxSize / 2;
+							}
+						}
+						if (choiceA.y == choiceB.y) {
+							lineY = choiceA.y;
+						} else {
+							if (choiceA.y > choiceB.y) {
+								lineY = choiceA.y - boxSize / 2;
+							} else {
+								lineY = choiceB.y - boxSize / 2;
+							}
+						}
+						var lineExists = false;
+						for (var r = 0; r < (boardSize * 2); r++) {
+							for (var c = 0; c < boardSize; c++) {
+								if (lineArr[r][c].centerX == lineX && lineArr[r][c].centerY == lineY) {
+									lineExists = true;
+								}
+							}
+						}
+						if(!lineExists) {
 							dotArr[i][j].dotColor = getTurnColor();
-							choiceB = dotArr[i][j];
+							//choiceB = dotArr[i][j];
 							choiceB.isActive = true;
+						} else {
+							choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 						}
 					}
+				}
 			}
 		}
 	}
-
 
 }
