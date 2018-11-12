@@ -1,6 +1,7 @@
 var playerOne;
 var playerTwo;
 var turn;
+var gameOver;
 
 var dotArr;
 var boxArr;
@@ -10,20 +11,27 @@ var dotSize;
 var boxSize;
 
 var boardSize;
+var totalFilledBoxes;
 
 var choiceA;
 var choiceB;
 
+var setPlayerColors;
+
 function setup() {
-	createCanvas(500, 500);
+	createCanvas(500, 600);
 
 	playerOne = new player(color(50, 50, 200), 0);
 	playerTwo = new player(color(200, 50, 50), 0);
+	setPlayerColors = true;
 	turn = true;
+	gameOver = false;
+
 
 	dotSize = 10;
 	boxSize = 50;
-	boardSize = 4;
+	boardSize = 9;
+	totalFilledBoxes = 0;
 
 	dotArr = [];
 	lineArr = [];
@@ -33,10 +41,37 @@ function setup() {
 	initalizeLineArr();
 	initalizeBoxArr();
 
-	console.log(lineArr);
-
 	choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 	choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
+	
+	p1c1Slider = createSlider(0, 255, 50);
+  p1c1Slider.position(10, height-100);
+	p1c2Slider = createSlider(0, 255, 50);
+  p1c2Slider.position(10, height-70);
+	p1c3Slider = createSlider(0, 255, 200);
+  p1c3Slider.position(10, height-40);
+  p2c1Slider = createSlider(0, 255, 200);
+  p2c1Slider.position(width-215, height-100);
+	p2c2Slider = createSlider(0, 255, 50);
+  p2c2Slider.position(width-215, height-70);
+	p2c3Slider = createSlider(0, 255, 50);
+  p2c3Slider.position(width-215, height-40);
+	
+	button = createButton('Confirm Player Colors');
+  button.position(width/2 - 100, 450);
+  button.mousePressed(startGame);
+}
+
+function startGame() {
+	setPlayerColors = false;
+	button.remove();
+	p1c1Slider.remove();
+	p1c2Slider.remove();
+	p1c3Slider.remove();
+  p2c1Slider.remove();
+	p2c2Slider.remove();
+	p2c3Slider.remove();
+	resizeCanvas(500,500);
 }
 
 function initalizeDotArr() {
@@ -79,7 +114,9 @@ function initalizeLineArr() {
 }
 
 function initalizeBoxArr() {
+	var lineNbr = 0;
 	for (var i = 0; i < boardSize - 1; i++) {
+		lineNbr = lineNbr * 2;
 		boxArr[i] = [];
 		for (var j = 0; j < boardSize - 1; j++) {
 			var centerX = i * boxSize + boxSize + (boxSize / 2);
@@ -87,8 +124,13 @@ function initalizeBoxArr() {
 
 			var nexti = i + 1;
 			var nextj = j + 1;
-			//boxArr[i][j] = new boxObj(centerX,centerY,color(100,100,100),lineArr[i][j],lineArr[nexti][nextj],lineArr[i][nextj],lineArr[nexti][j]);
-			//boxArr[i][j].setColor(color(100,100,100));
+			
+			var topLineX = i * 2;
+			var rightLineX = i * 2 + 3;
+			var leftLineX = i * 2 + 1;
+			var bottomLineX = i * 2;
+			boxArr[i][j] = new boxObj(centerX,centerY,color(100,100,100),lineArr[topLineX][j],lineArr[rightLineX][j],lineArr[leftLineX][j],lineArr[bottomLineX][nextj]);
+			boxArr[i][j].setColor(color(100,100,100));
 		}
 	}
 }
@@ -113,6 +155,9 @@ function displayLines() {
 			stroke(51);
 			fill(lineArr[i][j].lineColor);
 			rect(lineArr[i][j].centerX, lineArr[i][j].centerY, lineArr[i][j].width, lineArr[i][j].height);
+			//fill(255);
+			//stroke(255);
+			//text(i + ", " + j, lineArr[i][j].centerX-10, lineArr[i][j].centerY);
 		}
 	}
 	pop();
@@ -129,6 +174,9 @@ function displayBoxes() {
 				fill(boxArr[i][j].boxColor);
 				rect(boxArr[i][j].centerX, boxArr[i][j].centerY, boxSize, boxSize);
 			}
+			//fill(255);
+			//stroke(255,0,0);
+			//text(i + ", " + j, boxArr[i][j].centerX-10, boxArr[i][j].centerY);
 		}
 	}
 	pop();
@@ -136,7 +184,28 @@ function displayBoxes() {
 
 function draw() {
 	background(51);
-	//displayBoxes();
+	
+	// SELECT PLAYER COLORS!
+	if(setPlayerColors) {
+	//player colors based on slider value
+	playerOne.playerColor = color(p1c1Slider.value(),p1c2Slider.value(),p1c3Slider.value());
+  playerTwo.playerColor = color(p2c1Slider.value(),p2c2Slider.value(),p2c3Slider.value());
+		
+	fill(playerOne.playerColor);
+	rect(50,50,200,300);
+		
+	fill(playerTwo.playerColor);
+	rect(250,50,200,300);
+	}
+	else {
+	// Display scores at top
+	stroke(255);
+	fill(255);
+	textSize(24);
+	text("Player 1 Score: " + playerOne.playerScore,10,25);
+	text("Player 2 Score: " + playerTwo.playerScore,width-215,25);
+	
+	displayBoxes();
 	displayLines();
 	displayDots();
 
@@ -149,8 +218,8 @@ function draw() {
 		pop();
 	}
 	if (choiceA.isActive && choiceB.isActive) {
-		console.log("CHOICE MADE!");
-		console.log(choiceA.x, choiceA.y, ",", choiceB.x, choiceB.y);
+		//console.log("CHOICE MADE!");
+		//console.log(choiceA.x, choiceA.y, ",", choiceB.x, choiceB.y);
 		var lineX;
 		var lineY;
 		if (choiceA.x == choiceB.x) {
@@ -173,8 +242,8 @@ function draw() {
 			}
 			//lineY = abs(choiceA.y - choiceB.y) + boxSize/2;
 		}
-		// activate the line between the two points
-
+		
+		// activate the line that cooresponds to the two selected points
 		for (var i = 0; i < (boardSize * 2); i++) {
 			for (var j = 0; j < boardSize; j++) {
 				if (lineArr[i][j].centerX == lineX && lineArr[i][j].centerY == lineY) {
@@ -184,12 +253,30 @@ function draw() {
 				}
 			}
 		}
+		
 		//console.log("Line Midpoint:");
 		//console.log(lineX,",",lineY);
-
+		
+		var numBoxesMade = checkGameBoard();
+		
 		// if no box has been made, change turns
-		turn = !turn;
-
+		if(numBoxesMade > 0) {
+			//console.log(numBoxesMade);
+			if (turn) {
+				playerOne.playerScore += numBoxesMade;
+			} else {
+				playerTwo.playerScore += numBoxesMade
+			}
+			totalFilledBoxes+= numBoxesMade;
+			
+			//console.log("Player 1 Score: " + playerOne.playerScore);
+			//console.log("Player 2 Score: " + playerTwo.playerScore);
+			
+			
+		} else {
+			turn = !turn;
+		}
+		
 		choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 		choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 	}
@@ -199,11 +286,53 @@ function draw() {
 		for (var j = 0; j < dotArr.length; j++) {
 			if (dist(mouseX, mouseY, dotArr[i][j].x, dotArr[i][j].y) <= dotSize / 2) {
 				//if(!dotArr[i][j].isActive)
-				fill(0, 255, 0);
+				fill(getTurnColor());
 				ellipse(dotArr[i][j].x, dotArr[i][j].y, dotSize);
 			}
 		}
 	}
+	
+	if(totalFilledBoxes == ( (boardSize-1) * (boardSize-1) )) {
+			// All boxes have been filled
+			background(51);
+			stroke(255,0,0);
+			textSize(72);
+			text("Game Over!",50,height/2);
+			textSize(36);
+			text("Player 1 Score: " + playerOne.playerScore,width/2-100,height/2+50);
+			text("Player 2 Score: " + playerTwo.playerScore,width/2-100,height/2+100);
+			noLoop();
+		}
+	}
+}
+
+function checkGameBoard() {
+	var boxesMade = 0;
+	
+	var lineNbr = 0;
+	for (var i = 0; i < boardSize - 1; i++) {
+		lineNbr = lineNbr * 2;
+		for (var j = 0; j < boardSize - 1; j++) {
+			var centerX = i * boxSize + boxSize + (boxSize / 2);
+			var centerY = j * boxSize + boxSize + (boxSize / 2);
+
+			var nexti = i + 1;
+			var nextj = j + 1;
+			
+			var topLineX = i * 2;
+			var rightLineX = i * 2 + 3;
+			var leftLineX = i * 2 + 1;
+			var bottomLineX = i * 2;
+			if(!boxArr[i][j].isLocked) {
+				if(lineArr[topLineX][j].isActive && lineArr[rightLineX][j].isActive && lineArr[leftLineX][j].isActive && lineArr[bottomLineX][nextj].isActive) {
+					boxArr[i][j].setColor(getTurnColor());
+					boxArr[i][j].isLocked = true;
+					boxesMade += 1;
+				}
+			}
+		}
+	}
+	return boxesMade;
 }
 
 function getTurnColor() {
@@ -216,14 +345,14 @@ function getTurnColor() {
 	return currColor;
 }
 
-function mousePressed() {
+function mousePressed() {	
 	for (var i = 0; i < dotArr.length; i++) {
 		for (var j = 0; j < dotArr.length; j++) {
 			if (dist(mouseX, mouseY, dotArr[i][j].x, dotArr[i][j].y) <= dotSize / 2) {
 				//if dot clicked was choiceA, unselect choiceA
 				if (dotArr[i][j].x == choiceA.x && dotArr[i][j].y == choiceA.y) {
 					dotArr[i][j].dotColor = color(0, 0, 0, 0);
-					choiceA.isActive = false;
+					choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 				} else {
 					if (!choiceA.isActive) {
 						// if dot is not currently part of a box?

@@ -7,6 +7,7 @@ class boxObj {
 		this.leftLine = _l3;
 		this.bottomLine = _l4;
 		this.boxColor = _c;
+		this.isLocked = false;
 	}
 
 	setColor(_c) {
