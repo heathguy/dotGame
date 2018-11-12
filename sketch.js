@@ -244,8 +244,6 @@ function draw() {
 			pop();
 		}
 		if (choiceA.isActive && choiceB.isActive) {
-			//console.log("CHOICE MADE!");
-			//console.log(choiceA.x, choiceA.y, ",", choiceB.x, choiceB.y);
 			var lineX;
 			var lineY;
 			if (choiceA.x == choiceB.x) {
@@ -256,7 +254,6 @@ function draw() {
 				} else {
 					lineX = choiceB.x - boxSize / 2;
 				}
-				//lineX = abs(choiceA.x - choiceB.x) + boxSize/2;
 			}
 			if (choiceA.y == choiceB.y) {
 				lineY = choiceA.y;
@@ -266,22 +263,17 @@ function draw() {
 				} else {
 					lineY = choiceB.y - boxSize / 2;
 				}
-				//lineY = abs(choiceA.y - choiceB.y) + boxSize/2;
 			}
 
 			// activate the line that cooresponds to the two selected points
 			for (var i = 0; i < (boardSize * 2); i++) {
 				for (var j = 0; j < boardSize; j++) {
 					if (lineArr[i][j].centerX == lineX && lineArr[i][j].centerY == lineY) {
-						//console.log("LINE FOUND!");
 						lineArr[i][j].isActive = true;
 						lineArr[i][j].setColor(getTurnColor());
 					}
 				}
 			}
-
-			//console.log("Line Midpoint:");
-			//console.log(lineX,",",lineY);
 
 			var numBoxesMade = checkGameBoard();
 
@@ -294,10 +286,6 @@ function draw() {
 					playerTwo.playerScore += numBoxesMade
 				}
 				totalFilledBoxes += numBoxesMade;
-
-				//console.log("Player 1 Score: " + playerOne.playerScore);
-				//console.log("Player 2 Score: " + playerTwo.playerScore);
-
 
 			} else {
 				turn = !turn;
@@ -400,9 +388,9 @@ function mousePressed() {
 						choiceA.isActive = true;
 
 					} else { // set choiceB
+						// Check to see if the new choice is one dot away from Choice A
 						if (dist(choiceA.x, choiceA.y, dotArr[i][j].x, dotArr[i][j].y) <= boxSize) {
 							choiceB = dotArr[i][j];
-							// if dot is not currently part of a box?
 							var lineX;
 							var lineY;
 							if (choiceA.x == choiceB.x) {
@@ -424,17 +412,16 @@ function mousePressed() {
 								}
 							}
 							var lineExists = false;
+							// make sure dot is not currently part of a box
 							for (var r = 0; r < (boardSize * 2); r++) {
 								for (var c = 0; c < boardSize; c++) {
 									if (lineArr[r][c].centerX == lineX && lineArr[r][c].centerY == lineY && lineArr[r][c].isActive) {
-										//console.log("LINE EXISTS!");
 										lineExists = true;
 									}
 								}
 							}
 							if (!lineExists) {
 								dotArr[i][j].dotColor = getTurnColor();
-								//choiceB = dotArr[i][j];
 								choiceB.isActive = true;
 							} else {
 								choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
