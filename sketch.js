@@ -187,15 +187,26 @@ function draw() {
 	
 	// SELECT PLAYER COLORS!
 	if(setPlayerColors) {
+		push();
+		fill(playerOne.playerColor);
+		rect(50,50,200,300);
+
+		fill(playerTwo.playerColor);
+		rect(250,50,200,300);
+		
+		textSize(24);
+		fill(255);
+		strokeWeight(2);
+		stroke(0);
+		text("Player 1",100,200);
+		text("Player 2",300,200);
+		text("Set Player Colors",150,375);
+		pop();
 	//player colors based on slider value
 	playerOne.playerColor = color(p1c1Slider.value(),p1c2Slider.value(),p1c3Slider.value());
   playerTwo.playerColor = color(p2c1Slider.value(),p2c2Slider.value(),p2c3Slider.value());
 		
-	fill(playerOne.playerColor);
-	rect(50,50,200,300);
-		
-	fill(playerTwo.playerColor);
-	rect(250,50,200,300);
+	
 	}
 	else {
 	// Display scores at top
@@ -303,7 +314,16 @@ function draw() {
 			text("Player 2 Score: " + playerTwo.playerScore,width/2-100,height/2+100);
 			noLoop();
 		}
+		
+		// display current player's turn
+	var currPlayer = (turn ? 1 : 2)
+	stroke(0);
+	fill(getTurnColor());
+	textSize(24);
+	text("Player " + currPlayer + "'s Turn",width/2-100,height-10);
+
 	}
+	
 }
 
 function checkGameBoard() {
