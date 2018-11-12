@@ -221,7 +221,7 @@ function draw() {
 	//player colors based on slider value
 	playerOne.playerColor = color(p1c1Slider.value(),p1c2Slider.value(),p1c3Slider.value());
   playerTwo.playerColor = color(p2c1Slider.value(),p2c2Slider.value(),p2c3Slider.value());
-		
+	//playerTwo.playerColor = color(p1c3Slider.value(),p1c1Slider.value(),p1c2Slider.value());
 	
 	}
 	else {
@@ -333,11 +333,14 @@ function draw() {
 		}else {
 		
 		// display current player's turn
+			push();
 	var currPlayer = (turn ? 1 : 2)
-	stroke(0);
+	stroke(255);
+	//strokeWeight(3);
 	fill(getTurnColor());
 	textSize(24);
-	text("Player " + currPlayer + "'s Turn",width/2-100,height-10);
+	text("Player " + currPlayer + "'s Turn",width/2-75,height-10);
+			pop();
 		}
 	}
 	
