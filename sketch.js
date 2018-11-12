@@ -26,20 +26,21 @@ function setup() {
 	setPlayerColors = true;
 	turn = true;
 	gameOver = false;
-
-
+  totalFilledBoxes = 0;
 	dotSize = 10;
 	boxSize = 50;
-	boardSize = 9;
-	totalFilledBoxes = 0;
+	
+	//boardSize = 9;
+	boardSizeSlider = createSlider(3, 9, 9);
+	boardSizeSlider.position(200,30);
 
 	dotArr = [];
 	lineArr = [];
 	boxArr = [];
 
-	initalizeDotArr();
-	initalizeLineArr();
-	initalizeBoxArr();
+	//initalizeDotArr();
+	//initalizeLineArr();
+	//initalizeBoxArr();
 
 	choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 	choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
@@ -72,6 +73,19 @@ function startGame() {
 	p2c2Slider.remove();
 	p2c3Slider.remove();
 	resizeCanvas(500,500);
+	
+	
+	boardSize = boardSizeSlider.value();
+	boardSizeSlider.remove();
+
+	dotArr = [];
+	lineArr = [];
+	boxArr = [];
+
+	initalizeDotArr();
+	initalizeLineArr();
+	initalizeBoxArr();
+	
 }
 
 function initalizeDotArr() {
@@ -187,17 +201,19 @@ function draw() {
 	
 	// SELECT PLAYER COLORS!
 	if(setPlayerColors) {
-		push();
+		push();		
 		fill(playerOne.playerColor);
-		rect(50,50,200,300);
+		rect(50,100,200,225);
 
 		fill(playerTwo.playerColor);
-		rect(250,50,200,300);
+		rect(250,100,200,225);
 		
 		textSize(24);
 		fill(255);
 		strokeWeight(2);
 		stroke(0);
+		text("Board Size: ",50,50);
+		
 		text("Player 1",100,200);
 		text("Player 2",300,200);
 		text("Set Player Colors",150,375);
@@ -306,14 +322,15 @@ function draw() {
 	if(totalFilledBoxes == ( (boardSize-1) * (boardSize-1) )) {
 			// All boxes have been filled
 			background(51);
-			stroke(255,0,0);
+			stroke(0,0,0);
+			fill(255);
 			textSize(72);
 			text("Game Over!",50,height/2);
 			textSize(36);
 			text("Player 1 Score: " + playerOne.playerScore,width/2-100,height/2+50);
 			text("Player 2 Score: " + playerTwo.playerScore,width/2-100,height/2+100);
 			noLoop();
-		}
+		}else {
 		
 		// display current player's turn
 	var currPlayer = (turn ? 1 : 2)
@@ -321,7 +338,7 @@ function draw() {
 	fill(getTurnColor());
 	textSize(24);
 	text("Player " + currPlayer + "'s Turn",width/2-100,height-10);
-
+		}
 	}
 	
 }
