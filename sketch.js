@@ -1,6 +1,10 @@
 var playerOne;
 var playerTwo;
 var turn;
+var computerPlayer;
+var lastComputerMove;
+var computerDifficulty;
+
 var gameOver;
 
 var dotArr;
@@ -25,6 +29,10 @@ function setup() {
 	playerTwo = new player(color(200, 50, 50), 0);
 	setPlayerColors = true;
 	turn = true;
+	computerPlayer = true;
+	computerDifficulty = 2;
+	lastComputerMove = new lineObj(0, 0, color(0, 0, 0, 0), 0, boxSize, dotSize);
+
 	gameOver = false;
 	totalFilledBoxes = 0;
 	dotSize = 10;
@@ -73,7 +81,6 @@ function startGame() {
 	p2c2Slider.remove();
 	p2c3Slider.remove();
 	resizeCanvas(500, 500);
-
 
 	boardSize = boardSizeSlider.value();
 	boardSizeSlider.remove();
@@ -235,6 +242,18 @@ function draw() {
 		displayLines();
 		displayDots();
 
+		// computer will control player 2
+		if (computerPlayer && !turn) {
+			makeComputerChoice();
+			console.log("COMPUTER CHOICE MADE!");
+			console.log(choiceA);
+			console.log(choiceB);
+			//makeComputerChoice();
+			//if (choiceA.isActive && !choiceB.isActive) {
+			//	makeComputerChoice();
+			//}
+		}
+
 		if (choiceA.isActive && !choiceB.isActive) {
 			// draw a line from current choice to mouse cursor
 			push();
@@ -271,6 +290,12 @@ function draw() {
 					if (lineArr[i][j].centerX == lineX && lineArr[i][j].centerY == lineY) {
 						lineArr[i][j].isActive = true;
 						lineArr[i][j].setColor(getTurnColor());
+
+						if (computerPlayer && !turn) {
+							lastComputerMove.setColor(getTurnColor());
+							lastComputerMove = lineArr[i][j];
+							lastComputerMove.setColor(color(255, 255, 0));
+						}
 					}
 				}
 			}
@@ -330,7 +355,12 @@ function draw() {
 			pop();
 		}
 	}
-
+	// draw last computer move different color
+	push();
+	//fill(255,255,0);
+	//lastComputerMove.setColor(color(255,255,0));
+	rect(lastComputerMove.x, lastComputerMove.y, lastComputerMove.w, lastComputerMove.h);
+	pop();
 }
 
 function checkGameBoard() {
@@ -432,4 +462,200 @@ function mousePressed() {
 			}
 		}
 	}
+}
+
+function makeComputerChoice() {
+	var choiceMade = false;
+	choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
+	choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
+	// computer Difficulty 2
+	// prioritize any line that makes a box, edges, then random
+
+	// computer Difficulty 3
+	// prioritize any line that make a box
+	// do not choose a line that makes 3 edges unless no other option
+
+	// computer Difficulty 4
+	// same as difficulty 3 but when choosing the option to make 3 edges,
+	// calculate how many boxes that will score the other player and choose
+	// the option that gives the least boxes
+
+	if (computerDifficulty == 2) {
+
+		// look for any chance to make a box
+		for (var i = 0; i < boardSize - 1; i++) {
+			for (var j = 0; j < boardSize - 1; j++) {
+				//console.log("SERACHING. . .");
+				if (!boxArr[i][j].isLocked) {
+					var numEdges = 0;
+					var inActiveLine = null;
+					if (boxArr[i][j].topLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].topLine;
+					}
+					if (boxArr[i][j].rightLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].rightLine;
+					}
+					if (boxArr[i][j].leftLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].leftLine;
+					}
+					if (boxArr[i][j].bottomLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].bottomLine;
+					}
+
+					if (numEdges == 3) {
+						if (inActiveLine.width > inActiveLine.height) { // line is horizontal
+							choiceA.x = inActiveLine.centerX - boxSize / 2;
+							choiceA.y = inActiveLine.centerY;
+
+							choiceB.x = inActiveLine.centerX + boxSize / 2;
+							choiceB.y = inActiveLine.centerY;
+						} else { // line is vertical
+							choiceA.x = inActiveLine.centerX;
+							choiceA.y = inActiveLine.centerY - boxSize / 2;
+
+							choiceB.x = inActiveLine.centerX;
+							choiceB.y = inActiveLine.centerY + boxSize / 2;
+						}
+						choiceA.isActive = true;
+						choiceB.isActive = true;
+						choiceA.dotColor = getTurnColor();
+						choiceB.dotColor = getTurnColor();
+						choiceMade = true;
+					}
+				}
+			}
+		}
+
+		if (!choiceMade) {
+			console.log("TRYING ANY DOT...");
+			for (var i = 0; i < (boardSize * 2); i++) {
+				for (var j = 0; j < boardSize; j++) {
+					//console.log("STILL SERACHING. . .");
+					if (!lineArr[i][j].isActive && (i == 0 || j == 0) && (lineArr[i][j].centerX < width - (boxSize * boardSize)) && (lineArr[i][j].centerY < height - (boxSize * boardSize))) {
+						//console.log("LINE FOUND: ");
+						//console.log(lineArr[i][j]);
+						// prioritize edges over other options
+						if (lineArr[i][j].width > lineArr[i][j].height) { // line is horizontal
+							choiceA.x = lineArr[i][j].centerX - boxSize / 2;
+							choiceA.y = lineArr[i][j].centerY;
+
+							choiceB.x = lineArr[i][j].centerX + boxSize / 2;
+							choiceB.y = lineArr[i][j].centerY;
+						} else { // line is vertical
+							choiceA.x = lineArr[i][j].centerX;
+							choiceA.y = lineArr[i][j].centerY - boxSize / 2;
+
+							choiceB.x = lineArr[i][j].centerX;
+							choiceB.y = lineArr[i][j].centerY + boxSize / 2;
+						}
+						choiceA.isActive = true;
+						choiceB.isActive = true;
+						choiceA.dotColor = getTurnColor();
+						choiceB.dotColor = getTurnColor();
+						choiceMade = true;
+					}
+					if(!lineArr[i][j].isActive && (lineArr[i][j].centerX < width - (boxSize * boardSize)) && (lineArr[i][j].centerY < height - (boxSize * boardSize))) {
+						//console.log("LINE FOUND: ");
+						//console.log(lineArr[i][j]);
+						// prioritize edges over other options
+						if (lineArr[i][j].width > lineArr[i][j].height) { // line is horizontal
+							choiceA.x = lineArr[i][j].centerX - boxSize / 2;
+							choiceA.y = lineArr[i][j].centerY;
+
+							choiceB.x = lineArr[i][j].centerX + boxSize / 2;
+							choiceB.y = lineArr[i][j].centerY;
+						} else { // line is vertical
+							choiceA.x = lineArr[i][j].centerX;
+							choiceA.y = lineArr[i][j].centerY - boxSize / 2;
+
+							choiceB.x = lineArr[i][j].centerX;
+							choiceB.y = lineArr[i][j].centerY + boxSize / 2;
+						}
+						choiceA.isActive = true;
+						choiceB.isActive = true;
+						choiceA.dotColor = getTurnColor();
+						choiceB.dotColor = getTurnColor();
+						choiceMade = true;
+					}
+				}
+			}
+		}
+	} // difficulty 2
+
+	if (computerDifficulty == 1 || choiceMade != true) {
+		var tempRow = int(random(0, dotArr.length));
+		var tempCol = int(random(0, dotArr.length));
+
+		for (var i = 0; i < dotArr.length; i++) {
+			for (var j = 0; j < dotArr.length; j++) {
+				if (dist(dotArr[tempRow][tempCol].x, dotArr[tempRow][tempCol].y, dotArr[i][j].x, dotArr[i][j].y) <= dotSize / 2) {
+					//if dot clicked was choiceA, unselect choiceA
+					if (dotArr[i][j].x == choiceA.x && dotArr[i][j].y == choiceA.y) {
+						dotArr[i][j].dotColor = color(0, 0, 0, 0);
+						choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
+					} else {
+						if (!choiceA.isActive) {
+							// if dot is not currently part of a box?
+							dotArr[i][j].dotColor = getTurnColor();
+							choiceA = dotArr[i][j];
+							choiceA.isActive = true;
+
+						} else { // set choiceB
+							// Check to see if the new choice is one dot away from Choice A
+							if (dist(choiceA.x, choiceA.y, dotArr[i][j].x, dotArr[i][j].y) <= boxSize) {
+								choiceB = dotArr[i][j];
+								var lineX;
+								var lineY;
+								if (choiceA.x == choiceB.x) {
+									lineX = choiceA.x;
+								} else {
+									if (choiceA.x > choiceB.x) {
+										lineX = choiceA.x - boxSize / 2;
+									} else {
+										lineX = choiceB.x - boxSize / 2;
+									}
+								}
+								if (choiceA.y == choiceB.y) {
+									lineY = choiceA.y;
+								} else {
+									if (choiceA.y > choiceB.y) {
+										lineY = choiceA.y - boxSize / 2;
+									} else {
+										lineY = choiceB.y - boxSize / 2;
+									}
+								}
+								var lineExists = false;
+								// make sure dot is not currently part of a box
+								for (var r = 0; r < (boardSize * 2); r++) {
+									for (var c = 0; c < boardSize; c++) {
+										if (lineArr[r][c].centerX == lineX && lineArr[r][c].centerY == lineY && lineArr[r][c].isActive) {
+											lineExists = true;
+										}
+									}
+								}
+								if (!lineExists) {
+									dotArr[i][j].dotColor = getTurnColor();
+									choiceB.isActive = true;
+								} else {
+									choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
+									makeComputerChoice();
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	} // computer difficulty 1
+
+
+
 }
