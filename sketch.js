@@ -4,6 +4,7 @@ var turn;
 var computerPlayer;
 var lastComputerMove;
 var computerDifficulty;
+var computerDifficultySlider;
 
 var gameOver;
 
@@ -29,26 +30,29 @@ function setup() {
 	playerTwo = new player(color(200, 50, 50), 0);
 	setPlayerColors = true;
 	turn = true;
-	computerPlayer = true;
+	computerPlayer = false;
 	computerDifficulty = 2;
 	lastComputerMove = new lineObj(0, 0, color(0, 0, 0, 0), 0, boxSize, dotSize);
 
 	gameOver = false;
 	totalFilledBoxes = 0;
-	dotSize = 10;
+	dotSize = 15;
 	boxSize = 50;
-
+	
 	//boardSize = 9;
-	boardSizeSlider = createSlider(3, 9, 9);
+
+	boardSizeSlider = createSlider(4, 9, 9);
 	boardSizeSlider.position(200, 30);
+
+	//checkbox to confirm computer player or not
+	//fill(255);
+	checkbox = createCheckbox(false);
+	checkbox.position(270, 65);
+	checkbox.changed(playVsComputer);
 
 	dotArr = [];
 	lineArr = [];
 	boxArr = [];
-
-	//initalizeDotArr();
-	//initalizeLineArr();
-	//initalizeBoxArr();
 
 	choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
 	choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
@@ -71,9 +75,22 @@ function setup() {
 	button.mousePressed(startGame);
 }
 
+function playVsComputer() {
+	computerPlayer = !computerPlayer
+	
+	if(this.checked()) {
+		computerDifficultySlider = createSlider(1, 2, 2);
+		computerDifficultySlider.position(200, 95);
+	}
+	else {
+			computerDifficultySlider.remove();
+		}
+}
+
 function startGame() {
 	setPlayerColors = false;
 	button.remove();
+	checkbox.remove();
 	p1c1Slider.remove();
 	p1c2Slider.remove();
 	p1c3Slider.remove();
@@ -84,7 +101,11 @@ function startGame() {
 
 	boardSize = boardSizeSlider.value();
 	boardSizeSlider.remove();
-
+	
+	if(computerPlayer) {
+	computerDifficulty = computerDifficultySlider.value();
+	computerDifficultySlider.remove();
+	}
 	dotArr = [];
 	lineArr = [];
 	boxArr = [];
@@ -92,6 +113,8 @@ function startGame() {
 	initalizeDotArr();
 	initalizeLineArr();
 	initalizeBoxArr();
+
+	//console.log(lineArr);
 
 }
 
@@ -123,12 +146,12 @@ function initalizeLineArr() {
 				//var centerX = i * (boxSize/2) + boxSize;
 				var centerX = i * boxSize / 2 + boxSize + (boxSize / 2);
 				var centerY = j * boxSize + boxSize;
-				lineArr[i][j] = new lineObj(centerX, centerY, color(0, 0, 0, 0), 0, boxSize, dotSize);
+				lineArr[i][j] = new lineObj(centerX, centerY, color(0, 0, 0, 0), 0, boxSize, dotSize / 2);
 
 			} else {
 				var centerX = i * boxSize / 2 + boxSize / 2;
 				var centerY = j * boxSize + boxSize + (boxSize / 2);
-				lineArr[i][j] = new lineObj(centerX, centerY, color(0, 0, 0, 0), 0, dotSize, boxSize);
+				lineArr[i][j] = new lineObj(centerX, centerY, color(0, 0, 0, 0), 0, dotSize / 2, boxSize);
 			}
 		}
 	}
@@ -210,20 +233,31 @@ function draw() {
 	if (setPlayerColors) {
 		push();
 		fill(playerOne.playerColor);
-		rect(50, 100, 200, 225);
+		rect(50, 150, 200, 225);
 
 		fill(playerTwo.playerColor);
-		rect(250, 100, 200, 225);
+		rect(250, 150, 200, 225);
 
 		textSize(24);
 		fill(255);
 		strokeWeight(2);
 		stroke(0);
 		text("Board Size: ", 50, 50);
-
-		text("Player 1", 100, 200);
-		text("Player 2", 300, 200);
-		text("Set Player Colors", 150, 375);
+		var bs = boardSizeSlider.value() - 1;
+		text(bs + " x " + bs, 350, 50);
+		text("Play Vs Computer? ", 50, 80);
+		if(computerPlayer) {
+			textSize(20);
+			text("Difficulty Level: ", 50, 110);
+		}
+		textSize(24);
+		text("Player 1", 100, 250);
+		if (computerPlayer) {
+			text("Computer", 300, 250);
+		} else {
+			text("Player 2", 300, 250);
+		}
+		text("Set Player Colors", 150, 400);
 		pop();
 		//player colors based on slider value
 		playerOne.playerColor = color(p1c1Slider.value(), p1c2Slider.value(), p1c3Slider.value());
@@ -236,7 +270,11 @@ function draw() {
 		fill(255);
 		textSize(24);
 		text("Player 1 Score: " + playerOne.playerScore, 10, 25);
-		text("Player 2 Score: " + playerTwo.playerScore, width - 215, 25);
+		if (computerPlayer) {
+			text("Computer Score: " + playerTwo.playerScore, width - 215, 25);
+		} else {
+			text("Player 2 Score: " + playerTwo.playerScore, width - 215, 25);
+		}
 
 		displayBoxes();
 		displayLines();
@@ -245,9 +283,11 @@ function draw() {
 		// computer will control player 2
 		if (computerPlayer && !turn) {
 			makeComputerChoice();
-			console.log("COMPUTER CHOICE MADE!");
-			console.log(choiceA);
-			console.log(choiceB);
+			//console.log("COMPUTER CHOICE MADE!");
+			choiceA.isActive = true;
+			choiceB.isActive = true;
+			//console.log(choiceA);
+			//console.log(choiceB);
 			//makeComputerChoice();
 			//if (choiceA.isActive && !choiceB.isActive) {
 			//	makeComputerChoice();
@@ -325,7 +365,8 @@ function draw() {
 			for (var j = 0; j < dotArr.length; j++) {
 				if (dist(mouseX, mouseY, dotArr[i][j].x, dotArr[i][j].y) <= dotSize / 2) {
 					//if(!dotArr[i][j].isActive)
-					fill(getTurnColor());
+					//fill(getTurnColor());
+					fill(255);
 					ellipse(dotArr[i][j].x, dotArr[i][j].y, dotSize);
 				}
 			}
@@ -340,7 +381,11 @@ function draw() {
 			text("Game Over!", 50, height / 2);
 			textSize(36);
 			text("Player 1 Score: " + playerOne.playerScore, width / 2 - 100, height / 2 + 50);
-			text("Player 2 Score: " + playerTwo.playerScore, width / 2 - 100, height / 2 + 100);
+			if (computerPlayer) {
+				text("Computer Score: " + playerTwo.playerScore, width / 2 - 100, height / 2 + 100);
+			} else {
+				text("Player 2 Score: " + playerTwo.playerScore, width / 2 - 100, height / 2 + 100);
+			}
 			noLoop();
 		} else {
 
@@ -351,7 +396,11 @@ function draw() {
 			//strokeWeight(3);
 			fill(getTurnColor());
 			textSize(24);
-			text("Player " + currPlayer + "'s Turn", width / 2 - 75, height - 10);
+			if (computerPlayer && !turn) {
+				text("Computer's Turn", width / 2 - 75, height - 10);
+			} else {
+				text("Player " + currPlayer + "'s Turn", width / 2 - 75, height - 10);
+			}
 			pop();
 		}
 	}
@@ -533,57 +582,67 @@ function makeComputerChoice() {
 				}
 			}
 		}
-
+		// if no boxes, try to play an edge
 		if (!choiceMade) {
-			console.log("TRYING ANY DOT...");
+			//console.log("TRYING ANY LINE DIFFICULTY 2...");
 			for (var i = 0; i < (boardSize * 2); i++) {
 				for (var j = 0; j < boardSize; j++) {
 					//console.log("STILL SERACHING. . .");
-					if (!lineArr[i][j].isActive && (i == 0 || j == 0) && (lineArr[i][j].centerX < width - (boxSize * boardSize)) && (lineArr[i][j].centerY < height - (boxSize * boardSize))) {
-						//console.log("LINE FOUND: ");
-						//console.log(lineArr[i][j]);
-						// prioritize edges over other options
-						if (lineArr[i][j].width > lineArr[i][j].height) { // line is horizontal
-							choiceA.x = lineArr[i][j].centerX - boxSize / 2;
-							choiceA.y = lineArr[i][j].centerY;
+					if (!lineArr[i][j].isActive && (lineArr[i][j].centerX <= (boxSize * boardSize)) && (lineArr[i][j].centerY <= (boxSize * boardSize))) {
+						//pick line if it is along an edge x is left or right edge
+						// or y is top or bottom edge
+						if (((lineArr[i][j].centerX == boxSize) || (lineArr[i][j].centerX == (boxSize * boardSize))) || ((lineArr[i][j].centerY == boxSize) || lineArr[i][j].centerY == ((boxSize * boardSize)))) {
+							//console.log("LINE FOUND: ");
+							//console.log(lineArr[i][j]);
+							// prioritize edges over other options
+							if (lineArr[i][j].width > lineArr[i][j].height) { // line is horizontal
+								choiceA.x = lineArr[i][j].centerX - boxSize / 2;
+								choiceA.y = lineArr[i][j].centerY;
 
-							choiceB.x = lineArr[i][j].centerX + boxSize / 2;
-							choiceB.y = lineArr[i][j].centerY;
-						} else { // line is vertical
-							choiceA.x = lineArr[i][j].centerX;
-							choiceA.y = lineArr[i][j].centerY - boxSize / 2;
+								choiceB.x = lineArr[i][j].centerX + boxSize / 2;
+								choiceB.y = lineArr[i][j].centerY;
+							} else { // line is vertical
+								choiceA.x = lineArr[i][j].centerX;
+								choiceA.y = lineArr[i][j].centerY - boxSize / 2;
 
-							choiceB.x = lineArr[i][j].centerX;
-							choiceB.y = lineArr[i][j].centerY + boxSize / 2;
+								choiceB.x = lineArr[i][j].centerX;
+								choiceB.y = lineArr[i][j].centerY + boxSize / 2;
+							}
+							choiceA.isActive = true;
+							choiceB.isActive = true;
+							choiceA.dotColor = getTurnColor();
+							choiceB.dotColor = getTurnColor();
+							choiceMade = true;
 						}
-						choiceA.isActive = true;
-						choiceB.isActive = true;
-						choiceA.dotColor = getTurnColor();
-						choiceB.dotColor = getTurnColor();
-						choiceMade = true;
 					}
-					if(!lineArr[i][j].isActive && (lineArr[i][j].centerX < width - (boxSize * boardSize)) && (lineArr[i][j].centerY < height - (boxSize * boardSize))) {
-						//console.log("LINE FOUND: ");
-						//console.log(lineArr[i][j]);
-						// prioritize edges over other options
-						if (lineArr[i][j].width > lineArr[i][j].height) { // line is horizontal
-							choiceA.x = lineArr[i][j].centerX - boxSize / 2;
-							choiceA.y = lineArr[i][j].centerY;
+				}
+			}
+		}
+		// if no boxes, pick any valid option
+		if (!choiceMade) {
+			//console.log("TRYING ANY LINE DIFFICULTY 2...");
+			for (var i = 0; i < (boardSize * 2); i++) {
+				for (var j = 0; j < boardSize; j++) {
+					//console.log("STILL SERACHING. . .");
+					if (!lineArr[i][j].isActive && (lineArr[i][j].centerX <= (boxSize * boardSize)) && (lineArr[i][j].centerY <= (boxSize * boardSize))) {
+							if (lineArr[i][j].width > lineArr[i][j].height) { // line is horizontal
+								choiceA.x = lineArr[i][j].centerX - boxSize / 2;
+								choiceA.y = lineArr[i][j].centerY;
 
-							choiceB.x = lineArr[i][j].centerX + boxSize / 2;
-							choiceB.y = lineArr[i][j].centerY;
-						} else { // line is vertical
-							choiceA.x = lineArr[i][j].centerX;
-							choiceA.y = lineArr[i][j].centerY - boxSize / 2;
+								choiceB.x = lineArr[i][j].centerX + boxSize / 2;
+								choiceB.y = lineArr[i][j].centerY;
+							} else { // line is vertical
+								choiceA.x = lineArr[i][j].centerX;
+								choiceA.y = lineArr[i][j].centerY - boxSize / 2;
 
-							choiceB.x = lineArr[i][j].centerX;
-							choiceB.y = lineArr[i][j].centerY + boxSize / 2;
-						}
-						choiceA.isActive = true;
-						choiceB.isActive = true;
-						choiceA.dotColor = getTurnColor();
-						choiceB.dotColor = getTurnColor();
-						choiceMade = true;
+								choiceB.x = lineArr[i][j].centerX;
+								choiceB.y = lineArr[i][j].centerY + boxSize / 2;
+							}
+							choiceA.isActive = true;
+							choiceB.isActive = true;
+							choiceA.dotColor = getTurnColor();
+							choiceB.dotColor = getTurnColor();
+							choiceMade = true;
 					}
 				}
 			}
@@ -591,69 +650,31 @@ function makeComputerChoice() {
 	} // difficulty 2
 
 	if (computerDifficulty == 1 || choiceMade != true) {
-		var tempRow = int(random(0, dotArr.length));
-		var tempCol = int(random(0, dotArr.length));
+		for (var i = 0; i < (boardSize * 2); i++) {
+				for (var j = 0; j < boardSize; j++) {
+					//console.log("STILL SERACHING. . .");
+					if (!lineArr[i][j].isActive && (lineArr[i][j].centerX <= (boxSize * boardSize)) && (lineArr[i][j].centerY <= (boxSize * boardSize))) {
+							if (lineArr[i][j].width > lineArr[i][j].height) { // line is horizontal
+								choiceA.x = lineArr[i][j].centerX - boxSize / 2;
+								choiceA.y = lineArr[i][j].centerY;
 
-		for (var i = 0; i < dotArr.length; i++) {
-			for (var j = 0; j < dotArr.length; j++) {
-				if (dist(dotArr[tempRow][tempCol].x, dotArr[tempRow][tempCol].y, dotArr[i][j].x, dotArr[i][j].y) <= dotSize / 2) {
-					//if dot clicked was choiceA, unselect choiceA
-					if (dotArr[i][j].x == choiceA.x && dotArr[i][j].y == choiceA.y) {
-						dotArr[i][j].dotColor = color(0, 0, 0, 0);
-						choiceA = new dotObj(0, 0, color(0, 0, 0, 0), 0);
-					} else {
-						if (!choiceA.isActive) {
-							// if dot is not currently part of a box?
-							dotArr[i][j].dotColor = getTurnColor();
-							choiceA = dotArr[i][j];
-							choiceA.isActive = true;
+								choiceB.x = lineArr[i][j].centerX + boxSize / 2;
+								choiceB.y = lineArr[i][j].centerY;
+							} else { // line is vertical
+								choiceA.x = lineArr[i][j].centerX;
+								choiceA.y = lineArr[i][j].centerY - boxSize / 2;
 
-						} else { // set choiceB
-							// Check to see if the new choice is one dot away from Choice A
-							if (dist(choiceA.x, choiceA.y, dotArr[i][j].x, dotArr[i][j].y) <= boxSize) {
-								choiceB = dotArr[i][j];
-								var lineX;
-								var lineY;
-								if (choiceA.x == choiceB.x) {
-									lineX = choiceA.x;
-								} else {
-									if (choiceA.x > choiceB.x) {
-										lineX = choiceA.x - boxSize / 2;
-									} else {
-										lineX = choiceB.x - boxSize / 2;
-									}
-								}
-								if (choiceA.y == choiceB.y) {
-									lineY = choiceA.y;
-								} else {
-									if (choiceA.y > choiceB.y) {
-										lineY = choiceA.y - boxSize / 2;
-									} else {
-										lineY = choiceB.y - boxSize / 2;
-									}
-								}
-								var lineExists = false;
-								// make sure dot is not currently part of a box
-								for (var r = 0; r < (boardSize * 2); r++) {
-									for (var c = 0; c < boardSize; c++) {
-										if (lineArr[r][c].centerX == lineX && lineArr[r][c].centerY == lineY && lineArr[r][c].isActive) {
-											lineExists = true;
-										}
-									}
-								}
-								if (!lineExists) {
-									dotArr[i][j].dotColor = getTurnColor();
-									choiceB.isActive = true;
-								} else {
-									choiceB = new dotObj(0, 0, color(0, 0, 0, 0), 0);
-									makeComputerChoice();
-								}
+								choiceB.x = lineArr[i][j].centerX;
+								choiceB.y = lineArr[i][j].centerY + boxSize / 2;
 							}
-						}
+							choiceA.isActive = true;
+							choiceB.isActive = true;
+							choiceA.dotColor = getTurnColor();
+							choiceB.dotColor = getTurnColor();
+							choiceMade = true;
 					}
 				}
 			}
-		}
 	} // computer difficulty 1
 
 
