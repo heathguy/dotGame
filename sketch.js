@@ -79,7 +79,7 @@ function playVsComputer() {
 	computerPlayer = !computerPlayer
 	
 	if(this.checked()) {
-		computerDifficultySlider = createSlider(1, 2, 2);
+		computerDifficultySlider = createSlider(1, 3, 2);
 		computerDifficultySlider.position(200, 95);
 	}
 	else {
