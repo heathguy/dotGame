@@ -528,6 +528,175 @@ function makeComputerChoice() {
 	// same as difficulty 3 but when choosing the option to make 3 edges,
 	// calculate how many boxes that will score the other player and choose
 	// the option that gives the least boxes
+	if (computerDifficulty == 3) {
+		// look for any chance to make a box
+		for (var i = 0; i < boardSize - 1; i++) {
+			for (var j = 0; j < boardSize - 1; j++) {
+				//console.log("SERACHING. . .");
+				if (!boxArr[i][j].isLocked) {
+					var numEdges = 0;
+					var inActiveLine = null;
+					if (boxArr[i][j].topLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].topLine;
+					}
+					if (boxArr[i][j].rightLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].rightLine;
+					}
+					if (boxArr[i][j].leftLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].leftLine;
+					}
+					if (boxArr[i][j].bottomLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].bottomLine;
+					}
+
+					if (numEdges == 3) {
+						if (inActiveLine.width > inActiveLine.height) { // line is horizontal
+							choiceA.x = inActiveLine.centerX - boxSize / 2;
+							choiceA.y = inActiveLine.centerY;
+
+							choiceB.x = inActiveLine.centerX + boxSize / 2;
+							choiceB.y = inActiveLine.centerY;
+						} else { // line is vertical
+							choiceA.x = inActiveLine.centerX;
+							choiceA.y = inActiveLine.centerY - boxSize / 2;
+
+							choiceB.x = inActiveLine.centerX;
+							choiceB.y = inActiveLine.centerY + boxSize / 2;
+						}
+						choiceA.isActive = true;
+						choiceB.isActive = true;
+						choiceA.dotColor = getTurnColor();
+						choiceB.dotColor = getTurnColor();
+						choiceMade = true;
+					}
+				}
+			}
+		}
+		// if no boxes, try to play an edge
+		if (!choiceMade) {
+			//console.log("TRYING ANY LINE DIFFICULTY 2...");
+			for (var i = 0; i < (boardSize * 2); i++) {
+				for (var j = 0; j < boardSize; j++) {
+					//console.log("STILL SERACHING. . .");
+					if (!lineArr[i][j].isActive && (lineArr[i][j].centerX <= (boxSize * boardSize)) && (lineArr[i][j].centerY <= (boxSize * boardSize))) {
+						//pick line if it is along an edge x is left or right edge
+						// or y is top or bottom edge
+						if (((lineArr[i][j].centerX == boxSize) || (lineArr[i][j].centerX == (boxSize * boardSize))) || ((lineArr[i][j].centerY == boxSize) || lineArr[i][j].centerY == ((boxSize * boardSize)))) {
+							//console.log("LINE FOUND: ");
+							//console.log(lineArr[i][j]);
+							// prioritize edges over other options
+							if (lineArr[i][j].width > lineArr[i][j].height) { // line is horizontal
+								choiceA.x = lineArr[i][j].centerX - boxSize / 2;
+								choiceA.y = lineArr[i][j].centerY;
+
+								choiceB.x = lineArr[i][j].centerX + boxSize / 2;
+								choiceB.y = lineArr[i][j].centerY;
+							} else { // line is vertical
+								choiceA.x = lineArr[i][j].centerX;
+								choiceA.y = lineArr[i][j].centerY - boxSize / 2;
+
+								choiceB.x = lineArr[i][j].centerX;
+								choiceB.y = lineArr[i][j].centerY + boxSize / 2;
+							}
+							choiceA.isActive = true;
+							choiceB.isActive = true;
+							choiceA.dotColor = getTurnColor();
+							choiceB.dotColor = getTurnColor();
+							choiceMade = true;
+						}
+					}
+				}
+			}
+		}
+		// if no boxes or edges, pick a line that does not make 3 sides of a box
+		for (var i = 0; i < boardSize - 1; i++) {
+			for (var j = 0; j < boardSize - 1; j++) {
+				//console.log("SERACHING. . .");
+				if (!boxArr[i][j].isLocked) {
+					var numEdges = 0;
+					var inActiveLine = null;
+					if (boxArr[i][j].topLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].topLine;
+					}
+					if (boxArr[i][j].rightLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].rightLine;
+					}
+					if (boxArr[i][j].leftLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].leftLine;
+					}
+					if (boxArr[i][j].bottomLine.isActive) {
+						numEdges += 1;
+					} else {
+						inActiveLine = boxArr[i][j].bottomLine;
+					}
+
+					if (numEdges <= 2) {
+						if (inActiveLine.width > inActiveLine.height) { // line is horizontal
+							choiceA.x = inActiveLine.centerX - boxSize / 2;
+							choiceA.y = inActiveLine.centerY;
+
+							choiceB.x = inActiveLine.centerX + boxSize / 2;
+							choiceB.y = inActiveLine.centerY;
+						} else { // line is vertical
+							choiceA.x = inActiveLine.centerX;
+							choiceA.y = inActiveLine.centerY - boxSize / 2;
+
+							choiceB.x = inActiveLine.centerX;
+							choiceB.y = inActiveLine.centerY + boxSize / 2;
+						}
+						choiceA.isActive = true;
+						choiceB.isActive = true;
+						choiceA.dotColor = getTurnColor();
+						choiceB.dotColor = getTurnColor();
+						choiceMade = true;
+					}
+				}
+			}
+		}
+		// if no boxes or edges or spots with 2 or less sides, pick any valid option
+		if (!choiceMade) {
+			//console.log("TRYING ANY LINE DIFFICULTY 2...");
+			for (var i = 0; i < (boardSize * 2); i++) {
+				for (var j = 0; j < boardSize; j++) {
+					//console.log("STILL SERACHING. . .");
+					if (!lineArr[i][j].isActive && (lineArr[i][j].centerX <= (boxSize * boardSize)) && (lineArr[i][j].centerY <= (boxSize * boardSize))) {
+							if (lineArr[i][j].width > lineArr[i][j].height) { // line is horizontal
+								choiceA.x = lineArr[i][j].centerX - boxSize / 2;
+								choiceA.y = lineArr[i][j].centerY;
+
+								choiceB.x = lineArr[i][j].centerX + boxSize / 2;
+								choiceB.y = lineArr[i][j].centerY;
+							} else { // line is vertical
+								choiceA.x = lineArr[i][j].centerX;
+								choiceA.y = lineArr[i][j].centerY - boxSize / 2;
+
+								choiceB.x = lineArr[i][j].centerX;
+								choiceB.y = lineArr[i][j].centerY + boxSize / 2;
+							}
+							choiceA.isActive = true;
+							choiceB.isActive = true;
+							choiceA.dotColor = getTurnColor();
+							choiceB.dotColor = getTurnColor();
+							choiceMade = true;
+					}
+				}
+			}
+		}
+	} // difficulty 3
 
 	if (computerDifficulty == 2) {
 
