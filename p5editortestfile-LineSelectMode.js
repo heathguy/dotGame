@@ -357,6 +357,7 @@ function draw() {
 				text("Player 2 Score: " + playerTwo.playerScore, width / 2 - 100, height / 2 + 100);
 			}
 			noLoop();
+			gameOver = true;
 		} else {
 			// display current player's turn
 			push();
@@ -374,7 +375,7 @@ function draw() {
 		}
 	}
 	// draw last computer move different color
-	if(computerPlayer) {
+	if(computerPlayer && !gameOver) {
 		push();
 		noStroke();
 		fill(color(255,255,0));
