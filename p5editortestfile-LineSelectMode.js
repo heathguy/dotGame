@@ -366,7 +366,6 @@ function draw() {
 	//lastComputerMove.setColor(color(255,255,0));
 	//rect(lastComputerMove.x, lastComputerMove.y, lastComputerMove.w, lastComputerMove.h);
 	//pop();
-	displayDots();
 }
 
 function checkGameBoard() {
