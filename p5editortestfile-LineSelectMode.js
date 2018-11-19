@@ -42,7 +42,7 @@ function setup() {
 	boxSize = 50;
 
 	// slider for the board size choice - from 4 to 8 boxes, and start at 8 boxes
-	boardSizeSlider = createSlider(3, 9, 9);
+	boardSizeSlider = createSlider(4, 9, 9);
 	boardSizeSlider.position(200, 30);
 
 	//checkbox to confirm computer player or not
