@@ -384,7 +384,7 @@ function draw() {
 						if ((mouseX > lineArr[i][j].centerX - (lineArr[i][j].width/2) + (dotSize)) && (mouseX < lineArr[i][j].centerX + (lineArr[i][j].width/2) - (dotSize)) && (mouseY > lineArr[i][j].centerY - dotSize) && (mouseY < lineArr[i][j].centerY + dotSize)) {
 							if (!lineArr[i][j].isActive) {
 								//stroke(51);
-								fill(255,255,255,200);
+								fill(255,255,255,255);
 								rect(lineArr[i][j].centerX, lineArr[i][j].centerY, lineArr[i][j].width, lineArr[i][j].height);
 								ellipse(lineArr[i][j].centerX-lineArr[i][j].width/2,lineArr[i][j].centerY,dotSize+2,dotSize+2);
 								ellipse(lineArr[i][j].centerX+lineArr[i][j].width/2,lineArr[i][j].centerY,dotSize+2,dotSize+2);
@@ -395,7 +395,7 @@ function draw() {
 					if ( (mouseX > lineArr[i][j].centerX - dotSize) && (mouseX < lineArr[i][j].centerX + dotSize) && (mouseY > lineArr[i][j].centerY - (lineArr[i][j].height/2) + (dotSize)) && (mouseY < lineArr[i][j].centerY + (lineArr[i][j].height/2) - (dotSize)) ) {
 							if (!lineArr[i][j].isActive) {
 								//stroke(51);
-								fill(255,255,255,200);
+								fill(255,255,255,255);
 								rect(lineArr[i][j].centerX, lineArr[i][j].centerY, lineArr[i][j].width, lineArr[i][j].height);
 								ellipse(lineArr[i][j].centerX,lineArr[i][j].centerY-lineArr[i][j].height/2,dotSize+2,dotSize+2);
 								ellipse(lineArr[i][j].centerX,lineArr[i][j].centerY+lineArr[i][j].height/2,dotSize+2,dotSize+2);
@@ -422,6 +422,7 @@ function draw() {
 			}
 			noLoop();
 			gameOver = true;
+			undoButton.remove();
 		} else {
 			// display current player's turn
 			push();
